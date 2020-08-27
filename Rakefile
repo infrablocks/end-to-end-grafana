@@ -138,3 +138,19 @@ namespace :service do
     t.vars = configuration.vars
   end
 end
+
+namespace :configuration do
+  RakeTerraform.define_command_tasks(
+      configuration_name: 'configuration',
+      argument_names: [:deployment_identifier]
+  ) do |t, args|
+    configuration = configuration
+        .for_scope(args.to_h.merge(role: 'configuration'))
+
+    t.source_directory = 'infra/configuration'
+    t.work_directory = 'build'
+
+    t.backend_config = configuration.backend_config
+    t.vars = configuration.vars
+  end
+end
