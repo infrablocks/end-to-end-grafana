@@ -103,6 +103,23 @@ namespace :cluster do
       comment: 'maintainers@infrablocks.io')
 end
 
+namespace :database do
+  RakeTerraform.define_command_tasks(
+      configuration_name: 'database',
+      argument_names: [:deployment_identifier]
+  ) do |t, args|
+    configuration = configuration
+        .for_scope(
+            args.to_h.merge(role: 'database'))
+
+    t.source_directory = 'infra/database'
+    t.work_directory = 'build'
+
+    t.backend_config = configuration.backend_config
+    t.vars = configuration.vars
+  end
+end
+
 namespace :service do
   RakeTerraform.define_command_tasks(
       configuration_name: 'service',
