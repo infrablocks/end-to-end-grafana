@@ -3,13 +3,12 @@ vars:
   grafana_user: "%{hiera('grafana_admin_user')}"
   grafana_password: "%{hiera('grafana_admin_password')}"
 
-  service_state_bucket_region: "%{hiera('service_state_bucket_region')}"
-  service_state_bucket_name: "%{hiera('service_state_bucket_name')}"
-  service_state_bucket_is_encrypted: "%{hiera('service_state_bucket_is_encrypted')}"
   service_state_key: "%{hiera('service_state_key')}"
+  service_state_bucket_name: "%{hiera('service_state_bucket_name')}"
+  service_state_bucket_region: "%{hiera('service_state_bucket_region')}"
 
 backend_config:
-  region: "%{hiera('configuration_state_bucket_region')}"
-  bucket: "%{hiera('configuration_state_bucket_name')}"
-  encrypt: "%{hiera('configuration_state_bucket_is_encrypted')}"
   key: "%{hiera('configuration_state_key')}"
+  bucket: "%{hiera('configuration_state_bucket_name')}"
+  region: "%{hiera('configuration_state_bucket_region')}"
+  encrypt: "%{hiera('configuration_state_bucket_is_encrypted')}"

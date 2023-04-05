@@ -1,16 +1,14 @@
-data "template_file" "grafana_task_container_definitions" {
-  template = file("${path.root}/container-definitions/grafana.json.tpl")
-
-  vars = {
-    env_file_object_path = data.template_file.env_file_object_path.rendered
+locals {
+  grafana_task_container_definitions = templatefile("${path.root}/container-definitions/grafana.json.tpl", {
+    env_file_object_path = local.env_file_object_path
     container_port = var.grafana_service_container_port
     host_port = var.grafana_service_host_port
-  }
+  })
 }
 
 module "grafana_service" {
   source  = "infrablocks/ecs-service/aws"
-  version = "2.4.0"
+  version = "4.2.0-rc.8"
 
   component = var.component
   deployment_identifier = var.deployment_identifier
@@ -18,7 +16,7 @@ module "grafana_service" {
   region = var.region
   vpc_id = data.aws_vpc.vpc.id
 
-  service_task_container_definitions = data.template_file.grafana_task_container_definitions.rendered
+  service_task_container_definitions = local.grafana_task_container_definitions
 
   service_name = var.component
   service_image = var.grafana_image

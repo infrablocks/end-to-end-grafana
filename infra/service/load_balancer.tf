@@ -4,7 +4,7 @@ data "aws_acm_certificate" "wildcard" {
 
 module "grafana_load_balancer" {
   source = "infrablocks/ecs-load-balancer/aws"
-  version = "2.4.0"
+  version = "3.1.0-rc.7"
 
   component = var.component
   deployment_identifier = var.deployment_identifier

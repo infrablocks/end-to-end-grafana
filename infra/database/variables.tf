@@ -12,10 +12,13 @@ variable "database_master_user_password" {}
 
 variable "allocated_storage" {}
 
-variable "network_state_bucket_name" {}
-variable "network_state_key" {}
-variable "network_state_bucket_region" {}
-variable "network_state_bucket_is_encrypted" {}
-
 variable "use_encrypted_storage" {}
 variable "use_multiple_availability_zones" {}
+
+variable "network_state_key" {}
+variable "network_state_bucket_name" {}
+variable "network_state_bucket_region" {}
+variable "network_state_bucket_is_encrypted" {
+  default = true
+  nullable = false
+}

@@ -1,57 +1,28 @@
 locals {
+  grafana_dns_name = "${var.component}-${var.deployment_identifier}.${data.terraform_remote_state.domain.outputs.domain_name}"
+
   env_file_object_key = "grafana/service/environments/default.env"
-}
+  env_file_object_path = "s3://${var.secrets_bucket_name}/${local.env_file_object_key}"
 
-data "template_file" "grafana_dns_name" {
-  template = "$${component}-$${deployment_identifier}.$${domain}"
+  database_url = "postgres://${var.database_user}:${var.database_password}@${data.terraform_remote_state.database.outputs.postgres_database_host}/${var.database_name}"
 
-  vars = {
-    component = var.component
-    deployment_identifier = var.deployment_identifier
-    domain = data.terraform_remote_state.domain.outputs.domain_name
-  }
-}
-
-data "template_file" "env_file_object_path" {
-  template = "s3://$${secrets_bucket}/$${environment_object_key}"
-
-  vars = {
-    secrets_bucket = var.secrets_bucket_name
-    environment_object_key = local.env_file_object_key
-  }
-}
-
-data "template_file" "database_url" {
-  template = "postgres://$${username}:$${password}@$${address}/$${name}"
-
-  vars = {
-    name = var.database_name
-    username = var.database_user
-    password = var.database_password
-    address = data.terraform_remote_state.database.outputs.postgres_database_host
-  }
-}
-
-data "template_file" "env" {
-  template = file("${path.root}/envfiles/grafana.env.tpl")
-
-  vars = {
+  env = templatefile("${path.root}/envfiles/grafana.env.tpl", {
     grafana_port = var.grafana_service_container_port
-    grafana_dns_name = data.template_file.grafana_dns_name.rendered
+    grafana_dns_name = local.grafana_dns_name
     grafana_admin_user = var.grafana_admin_user
     grafana_admin_password = var.grafana_admin_password
-    database_url = data.template_file.database_url.rendered
+    database_url = local.database_url
     database_host = data.terraform_remote_state.database.outputs.postgres_database_host
     database_name = var.database_name
     database_user = var.database_user
     database_password = var.database_password
-  }
+  })
 }
 
-resource "aws_s3_bucket_object" "env" {
+resource "aws_s3_object" "env" {
   key = local.env_file_object_key
   bucket = var.secrets_bucket_name
-  content = data.template_file.env.rendered
+  content = local.env
 
   server_side_encryption = "AES256"
 }
